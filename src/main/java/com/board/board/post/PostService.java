@@ -4,6 +4,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.dao.DataIntegrityViolationException;
 
 import com.board.board.category.Category;
 import com.board.board.category.CategoryRepository;
@@ -23,7 +24,8 @@ public class PostService {
     private final CategoryRepository categoryRepository;
     private final UserRepository userRepository;
     private final FileStorageService fileStorageService;
-    private final CommentRepository commentRepository; 
+    private final CommentRepository commentRepository;
+    private final PostViewService postViewService;
 
     @Transactional(readOnly = true)
     public Page<Post> getList(Pageable pageable) {
@@ -42,12 +44,22 @@ public class PostService {
                 .orElseThrow(() -> new PostNotFoundException("게시글을 찾을 수 없습니다."));
     }
 
-    // 상세 화면 조회 시 사용 (조회수 증가 포함)
     @Transactional
-    public Post getDetail(Long postId) {
+    public Post getDetail(Long postId, Long userId, String sessionId) {
         Post post = postRepository.findByIdWithUserAndCategory(postId)
                 .orElseThrow(() -> new PostNotFoundException("게시글을 찾을 수 없습니다."));
-        post.increaseViewCount();
+
+        boolean firstView = true;
+        try {
+            postViewService.recordView(postId, userId, sessionId);
+        } catch (DataIntegrityViolationException e) {
+            firstView = false;
+        }
+
+        if (firstView) {
+            post.increaseViewCount();
+        }
+
         return post;
     }
 
