@@ -32,7 +32,7 @@ public class PostController {
     public String list(@RequestParam(required = false) String type,
                         @RequestParam(required = false) String keyword,
                         @RequestParam(defaultValue = "LATEST") String sort,
-                        @PageableDefault(size = 20) Pageable pageable,
+                        @PageableDefault(size = 18) Pageable pageable,
                         Model model) {
 
         Sort.Direction direction = "OLDEST".equals(sort) ? Sort.Direction.ASC : Sort.Direction.DESC;
