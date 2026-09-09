@@ -1,5 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 <html>
 <head><title>게시판</title></head>
 <body>
@@ -23,15 +24,20 @@
 
 <table border="1" cellpadding="5">
     <tr>
-        <th>번호</th><th>카테고리</th><th>제목</th><th>작성자</th><th>작성일</th><th>조회수</th>
+        <th>번호</th><th>대표이미지</th><th>카테고리</th><th>제목</th><th>작성자</th><th>작성일</th><th>조회수</th>
     </tr>
     <c:forEach var="post" items="${postPage.content}">
         <tr>
             <td>${post.id}</td>
+            <td>
+                <c:if test="${post.thumbnail}">
+                    <img src="${post.imagePath}" width="60" height="60" />
+                </c:if>
+            </td>
             <td>${post.category.name}</td>
             <td><a href="/posts/${post.id}">${post.title}</a></td>
             <td>${post.user.name}</td>
-            <td>${post.createdAt}</td>
+            <td><fmt:formatDate value="${post.createdAtAsDate}" pattern="yyyy-MM-dd HH:mm" /></td>
             <td>${post.viewCount}</td>
         </tr>
     </c:forEach>

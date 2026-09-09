@@ -1,5 +1,7 @@
 package com.board.board.post;
 
+import java.util.Date;
+import java.time.ZoneId;
 import com.board.board.category.Category;
 import com.board.board.common.BaseTimeEntity;
 import com.board.board.user.User;
@@ -42,6 +44,27 @@ public class Post extends BaseTimeEntity {
     @Column(name = "view_count", nullable = false)
     private Long viewCount = 0L;
 
+    // 필드 추가 (viewCount 아래)
+    @Column(name = "image_path")
+    private String imagePath;
+
+    @Column(name = "image_original_name")
+    private String imageOriginalName;
+
+    @Column(name = "thumbnail", nullable = false)
+    private boolean thumbnail = false;
+
+    // 메서드 추가 (increaseViewCount() 아래)
+    public void attachImage(String storedFileName, String originalName, boolean useAsThumbnail) {
+        this.imagePath = "/uploads/" + storedFileName;
+        this.imageOriginalName = originalName;
+        this.thumbnail = useAsThumbnail;
+    }
+
+    public boolean hasImage() {
+        return this.imagePath != null;
+    }
+
     public static Post create(User user, Category category, String title, String content) {
         Post post = new Post();
         post.user = user;
@@ -62,7 +85,21 @@ public class Post extends BaseTimeEntity {
         this.viewCount++;
     }
 
+    public Date getCreatedAtAsDate() {
+        return Date.from(getCreatedAt().atZone(ZoneId.systemDefault()).toInstant());
+    }
+
     public boolean isWrittenBy(Long userId) {
         return this.user.getId().equals(userId);
+    }
+
+    public void removeImage() {
+    this.imagePath = null;
+    this.imageOriginalName = null;
+    this.thumbnail = false;
+    }
+
+    public void updateThumbnail(boolean useAsThumbnail) {
+        this.thumbnail = useAsThumbnail;
     }
 }

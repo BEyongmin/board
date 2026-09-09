@@ -1,5 +1,7 @@
 package com.board.board.comment;
 
+import java.util.Date;
+import java.time.ZoneId;
 import com.board.board.common.BaseTimeEntity;
 import com.board.board.post.Post;
 import com.board.board.user.User;
@@ -46,4 +48,8 @@ public class Comment extends BaseTimeEntity {
     public boolean isWrittenBy(Long userId) {
         return this.user.getId().equals(userId);
     }
+
+    public Date getCreatedAtAsDate() {
+    return Date.from(getCreatedAt().atZone(ZoneId.systemDefault()).toInstant());
+}
 }

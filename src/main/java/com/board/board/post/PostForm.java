@@ -1,5 +1,7 @@
 package com.board.board.post;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -19,4 +21,8 @@ public class PostForm {
 
     @NotBlank(message = "내용을 입력해주세요.")
     private String content;
+
+    private MultipartFile image;
+    private boolean useAsThumbnail;
+    private boolean removeImage;
 }

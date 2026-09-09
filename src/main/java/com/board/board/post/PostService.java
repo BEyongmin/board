@@ -1,15 +1,19 @@
 package com.board.board.post;
 
-import com.board.board.category.Category;
-import com.board.board.category.CategoryRepository;
-import com.board.board.common.ForbiddenException;
-import com.board.board.user.User;
-import com.board.board.user.UserRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.board.board.category.Category;
+import com.board.board.category.CategoryRepository;
+import com.board.board.comment.CommentRepository;
+import com.board.board.common.FileStorageService;
+import com.board.board.common.ForbiddenException;
+import com.board.board.user.User;
+import com.board.board.user.UserRepository;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -18,6 +22,8 @@ public class PostService {
     private final PostRepository postRepository;
     private final CategoryRepository categoryRepository;
     private final UserRepository userRepository;
+    private final FileStorageService fileStorageService;
+    private final CommentRepository commentRepository; 
 
     @Transactional(readOnly = true)
     public Page<Post> getList(Pageable pageable) {
@@ -48,6 +54,12 @@ public class PostService {
                 .orElseThrow(() -> new IllegalStateException("카테고리를 찾을 수 없습니다."));
 
         Post post = Post.create(user, category, form.getTitle(), form.getContent());
+
+        if (form.getImage() != null && !form.getImage().isEmpty()) {
+            String storedName = fileStorageService.store(form.getImage());
+            post.attachImage(storedName, form.getImage().getOriginalFilename(), form.isUseAsThumbnail());
+        }
+
         postRepository.save(post);
         return post.getId();
     }
@@ -64,17 +76,30 @@ public class PostService {
         Category category = categoryRepository.findById(form.getCategoryId())
                 .orElseThrow(() -> new IllegalStateException("카테고리를 찾을 수 없습니다."));
         post.update(category, form.getTitle(), form.getContent());
+
+        if (form.isRemoveImage()) {
+            // 1: 이미지 체크 시 무조건 삭제
+            post.removeImage();
+        } else if (form.getImage() != null && !form.getImage().isEmpty()) {
+            // 2: 새 파일이 올라왔으면 교체
+            String storedName = fileStorageService.store(form.getImage());
+            post.attachImage(storedName, form.getImage().getOriginalFilename(), form.isUseAsThumbnail());
+        } else if (post.hasImage()) {
+            // 3: 새 파일도 없고 삭제도 아니면, 대표 여부만 갱신
+            post.updateThumbnail(form.isUseAsThumbnail());
+        }
     }
 
     @Transactional
-    public void delete(Long postId, Long userId) {
-        Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new PostNotFoundException("게시글을 찾을 수 없습니다."));
+        public void delete(Long postId, Long userId) {
+            Post post = postRepository.findById(postId)
+                    .orElseThrow(() -> new PostNotFoundException("게시글을 찾을 수 없습니다."));
 
-        if (!post.isWrittenBy(userId)) {
-            throw new ForbiddenException("삭제 권한이 없습니다.");
+            if (!post.isWrittenBy(userId)) {
+                throw new ForbiddenException("삭제 권한이 없습니다.");
+            }
+
+            commentRepository.deleteAllByPostId(postId);
+            postRepository.delete(post);
         }
-
-        postRepository.delete(post);
-    }
 }

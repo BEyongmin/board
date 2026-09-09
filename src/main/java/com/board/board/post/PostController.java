@@ -71,10 +71,12 @@ public class PostController {
         postForm.setCategoryId(post.getCategory().getId());
         postForm.setTitle(post.getTitle());
         postForm.setContent(post.getContent());
+        postForm.setUseAsThumbnail(post.isThumbnail());
 
         model.addAttribute("postForm", postForm);
         model.addAttribute("categories", categoryRepository.findAll());
         model.addAttribute("postId", id);
+        model.addAttribute("currentImagePath", post.getImagePath());
         return "post/form";
     }
 

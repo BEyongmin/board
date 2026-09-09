@@ -1,5 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 <html>
 <head><title>${post.title}</title></head>
 <body>
@@ -16,13 +17,16 @@
         <button type="submit" onclick="return confirm('삭제하시겠습니까?')">삭제</button>
     </form>
 </c:if>
+<c:if test="${post.hasImage()}">
+    <img src="${post.imagePath}" width="300" /><br/>
+</c:if>
 <hr/>
 <h3>댓글</h3>
 
 <c:forEach var="comment" items="${comments}">
     <p>
         <strong>${comment.user.name}</strong> : ${comment.content}
-        <small>(${comment.createdAt})</small>
+        <small>(<fmt:formatDate value="${comment.createdAtAsDate}" pattern="yyyy-MM-dd HH:mm" />)</small>
         <c:if test="${pageContext.request.userPrincipal != null and pageContext.request.userPrincipal.name == comment.user.email}">
             <form action="/comments/${comment.id}/delete" method="post" style="display:inline">
                 <%@ include file="/WEB-INF/views/fragments/csrf.jsp" %>
