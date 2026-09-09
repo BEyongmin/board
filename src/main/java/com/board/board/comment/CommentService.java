@@ -17,6 +17,7 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final PostRepository postRepository;
     private final UserRepository userRepository;
+    private final com.board.board.common.RateLimiter rateLimiter;
 
     @Transactional(readOnly = true)
     public List<Comment> getComments(Long postId) {
@@ -25,6 +26,10 @@ public class CommentService {
 
     @Transactional
     public void create(Long postId, Long userId, CommentForm form) {
+
+        if (!rateLimiter.isAllowed("comment:" + userId, 5, 60_000)) {
+            throw new com.board.board.common.TooManyRequestsException("잠시 후 다시 시도해주세요. (1분에 최대 5개까지 작성 가능)");
+        }
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new IllegalStateException("게시글을 찾을 수 없습니다."));
         User user = userRepository.findById(userId)

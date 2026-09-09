@@ -26,6 +26,7 @@ public class PostService {
     private final FileStorageService fileStorageService;
     private final CommentRepository commentRepository;
     private final PostViewService postViewService;
+    private final com.board.board.common.RateLimiter rateLimiter;
 
     @Transactional(readOnly = true)
     public Page<Post> getList(Pageable pageable) {
@@ -65,8 +66,13 @@ public class PostService {
 
     @Transactional
     public Long create(Long userId, PostForm form) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalStateException("사용자를 찾을 수 없습니다."));
+        
+    if (!rateLimiter.isAllowed("post:" + userId, 3, 60_000)) {
+            throw new com.board.board.common.TooManyRequestsException("잠시 후 다시 시도해주세요. (1분에 최대 3개까지 작성 가능)");
+        }
+
+    User user = userRepository.findById(userId)
+            .orElseThrow(() -> new IllegalStateException("사용자를 찾을 수 없습니다."));
         Category category = categoryRepository.findById(form.getCategoryId())
                 .orElseThrow(() -> new IllegalStateException("카테고리를 찾을 수 없습니다."));
 

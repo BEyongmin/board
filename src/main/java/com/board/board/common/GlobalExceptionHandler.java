@@ -23,4 +23,11 @@ public class GlobalExceptionHandler {
         model.addAttribute("message", e.getMessage());
         return "error/403";
     }
+
+    @ExceptionHandler(TooManyRequestsException.class)
+    @ResponseStatus(HttpStatus.TOO_MANY_REQUESTS)
+    public String handleTooManyRequests(TooManyRequestsException e, Model model) {
+        model.addAttribute("message", e.getMessage());
+        return "error/429";
+    }
 }
