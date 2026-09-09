@@ -2,6 +2,8 @@ package com.board.board.post;
 
 import com.board.board.auth.CustomUserDetails;
 import com.board.board.category.CategoryRepository;
+import com.board.board.comment.CommentService;
+
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -20,6 +22,7 @@ public class PostController {
 
     private final PostService postService;
     private final CategoryRepository categoryRepository;
+    private final CommentService commentService;
 
     @GetMapping
     public String list(@PageableDefault(size = 20, sort = "id", direction = Sort.Direction.DESC) Pageable pageable,
@@ -31,6 +34,7 @@ public class PostController {
     @GetMapping("/{id}")
     public String detail(@PathVariable Long id, Model model) {
         model.addAttribute("post", postService.getDetail(id));
+        model.addAttribute("comments", commentService.getComments(id));
         return "post/detail";
     }
 

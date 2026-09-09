@@ -32,6 +32,7 @@ public class SecurityConfig {
 
                 // 게시글 작성/수정/삭제(POST)는 로그인 필요
                 .requestMatchers(HttpMethod.POST, "/posts/**").authenticated()
+                .requestMatchers(HttpMethod.POST, "/posts/**").authenticated()
 
                 .anyRequest().authenticated()
             )
