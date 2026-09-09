@@ -1,5 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
+
 <html>
 <head><title>로그인</title></head>
 <body>
@@ -16,7 +17,7 @@
 </c:if>
 
 <form action="/login" method="post">
-    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+    <%@ include file="fragments/csrf.jsp" %>
     <input type="email" name="email" placeholder="이메일" required /><br/>
     <input type="password" name="password" placeholder="비밀번호" required /><br/>
     <button type="submit">로그인</button>
