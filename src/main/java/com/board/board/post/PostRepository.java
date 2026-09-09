@@ -17,4 +17,14 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     @Query("select p from Post p join fetch p.user join fetch p.category where p.id = :id")
     Optional<Post> findByIdWithUserAndCategory(@Param("id") Long id);
+
+     @Query(
+        value = "select p from Post p join fetch p.user join fetch p.category " +
+                "where (:type = 'TITLE' and p.title like concat('%', :keyword, '%')) " +
+                "or (:type = 'AUTHOR' and p.user.name like concat('%', :keyword, '%'))",
+        countQuery = "select count(p) from Post p " +
+                "where (:type = 'TITLE' and p.title like concat('%', :keyword, '%')) " +
+                "or (:type = 'AUTHOR' and p.user.name like concat('%', :keyword, '%'))"
+    )
+    Page<Post> search(@Param("type") String type, @Param("keyword") String keyword, Pageable pageable);
 }

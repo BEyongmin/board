@@ -6,6 +6,9 @@ import com.board.board.comment.CommentService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -24,12 +27,33 @@ public class PostController {
     private final CategoryRepository categoryRepository;
     private final CommentService commentService;
 
-    @GetMapping
-    public String list(@PageableDefault(size = 20, sort = "id", direction = Sort.Direction.DESC) Pageable pageable,
-                        Model model) {
-        model.addAttribute("postPage", postService.getList(pageable));
-        return "post/list";
+@GetMapping
+public String list(@RequestParam(required = false) String type,
+                    @RequestParam(required = false) String keyword,
+                    @RequestParam(defaultValue = "LATEST") String sort,
+                    @PageableDefault(size = 20) Pageable pageable,
+                    Model model) {
+
+    Sort.Direction direction = "OLDEST".equals(sort) ? Sort.Direction.ASC : Sort.Direction.DESC;
+    Pageable sortedPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(direction, "id"));
+
+    Page<Post> postPage;
+    boolean hasKeyword = keyword != null && !keyword.isBlank();
+
+    if (hasKeyword) {
+        String searchType = (type == null || type.isBlank()) ? "TITLE" : type;
+        postPage = postService.search(searchType, keyword, sortedPageable);
+        model.addAttribute("type", searchType);
+    } else {
+        postPage = postService.getList(sortedPageable);
+        model.addAttribute("type", "TITLE");
     }
+
+    model.addAttribute("postPage", postPage);
+    model.addAttribute("keyword", keyword);
+    model.addAttribute("sort", sort);
+    return "post/list";
+}
 
     @GetMapping("/{id}")
     public String detail(@PathVariable Long id, Model model) {

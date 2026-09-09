@@ -30,6 +30,11 @@ public class PostService {
         return postRepository.findAllWithUserAndCategory(pageable);
     }
 
+    @Transactional(readOnly = true)
+    public Page<Post> search(String type, String keyword, Pageable pageable) {
+        return postRepository.search(type, keyword, pageable);
+    }
+
     // 수정 폼 등에서 조회수 증가 없이 단순 조회할 때 사용
     @Transactional(readOnly = true)
     public Post getById(Long postId) {
