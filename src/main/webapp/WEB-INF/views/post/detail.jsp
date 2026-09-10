@@ -2,48 +2,70 @@
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 <html>
-<head><title>${post.title}</title></head>
+<head>
+    <title>${post.title}</title>
+    <link rel="stylesheet" href="/css/board.css" />
+</head>
 <body>
-<h1>${post.title}</h1>
-<p>카테고리: ${post.category.name} | 작성자: ${post.user.name} | 작성일: ${post.createdAt} | 조회수: ${post.viewCount}</p>
-<hr/>
-<p>${post.content}</p>
-<hr/>
+<div class="page-wrap">
+    <%@ include file="/WEB-INF/views/fragments/header.jsp" %>
+    <a class="back-link" href="/posts">목록으로</a>
+    <div class="detail-note">
+        <span class="cat">${post.category.name}</span>
+        <h1>${post.title}</h1>
+        <p class="meta">
+            ${post.user.name} ·
+            <fmt:formatDate value="${post.createdAtAsDate}" pattern="yyyy-MM-dd HH:mm" /> ·
+            조회 ${post.viewCount}
+        </p>
 
-<c:if test="${pageContext.request.userPrincipal != null and pageContext.request.userPrincipal.name == post.user.email}">
-    <a href="/posts/${post.id}/edit">수정</a>
-    <form action="/posts/${post.id}/delete" method="post" style="display:inline">
-        <%@ include file="/WEB-INF/views/fragments/csrf.jsp" %>
-        <button type="submit" onclick="return confirm('삭제하시겠습니까?')">삭제</button>
-    </form>
-</c:if>
-<c:if test="${post.hasImage()}">
-    <img src="${post.imagePath}" width="300" /><br/>
-</c:if>
-<hr/>
-<h3>댓글</h3>
-
-<c:forEach var="comment" items="${comments}">
-    <p>
-        <strong>${comment.user.name}</strong> : ${comment.content}
-        <small>(<fmt:formatDate value="${comment.createdAtAsDate}" pattern="yyyy-MM-dd HH:mm" />)</small>
-        <c:if test="${pageContext.request.userPrincipal != null and pageContext.request.userPrincipal.name == comment.user.email}">
-            <form action="/comments/${comment.id}/delete" method="post" style="display:inline">
-                <%@ include file="/WEB-INF/views/fragments/csrf.jsp" %>
-                <input type="hidden" name="postId" value="${post.id}" />
-                <button type="submit" onclick="return confirm('댓글을 삭제하시겠습니까?')">삭제</button>
-            </form>
+        <c:if test="${post.hasImage()}">
+            <img class="image" src="${post.imagePath}" />
         </c:if>
-    </p>
-</c:forEach>
 
-<c:if test="${pageContext.request.userPrincipal != null}">
-    <form action="/posts/${post.id}/comments" method="post">
-        <%@ include file="/WEB-INF/views/fragments/csrf.jsp" %>
-        <textarea name="content" rows="3" cols="40" placeholder="댓글을 입력하세요"></textarea><br/>
-        <button type="submit">댓글 등록</button>
-    </form>
-</c:if>
-<a href="/posts">목록으로</a>
+        <p class="body">${post.content}</p>
+
+        <c:if test="${pageContext.request.userPrincipal != null and pageContext.request.userPrincipal.name == post.user.email}">
+            <div class="actions">
+                <a class="btn-fill" href="/posts/${post.id}/edit">수정</a>
+                <form action="/posts/${post.id}/delete" method="post">
+                    <%@ include file="/WEB-INF/views/fragments/csrf.jsp" %>
+                    <button type="submit" class="btn-outline" onclick="return confirm('삭제하시겠습니까?')">삭제</button>
+                </form>
+            </div>
+        </c:if>
+    </div>
+
+    <p class="comment-heading">댓글 ${comments.size()}개</p>
+
+    <div class="comment-list">
+        <c:forEach var="comment" items="${comments}" varStatus="status">
+            <div class="comment-note ${status.index % 2 == 0 ? 'blue' : 'clay'}">
+                <p class="author">${comment.user.name}</p>
+                <p class="content">${comment.content}</p>
+                <p class="time"><fmt:formatDate value="${comment.createdAtAsDate}" pattern="MM-dd HH:mm" /></p>
+                <c:if test="${pageContext.request.userPrincipal != null and pageContext.request.userPrincipal.name == comment.user.email}">
+                    <form action="/comments/${comment.id}/delete" method="post">
+                        <%@ include file="/WEB-INF/views/fragments/csrf.jsp" %>
+                        <input type="hidden" name="postId" value="${post.id}" />
+                        <button type="submit" onclick="return confirm('댓글을 삭제하시겠습니까?')">삭제</button>
+                    </form>
+                </c:if>
+            </div>
+        </c:forEach>
+    </div>
+
+    <c:if test="${pageContext.request.userPrincipal != null}">
+        <div class="comment-form-note">
+            <form action="/posts/${post.id}/comments" method="post">
+                <%@ include file="/WEB-INF/views/fragments/csrf.jsp" %>
+                <textarea name="content" placeholder="댓글을 남겨보세요"></textarea>
+                <div class="submit-row">
+                    <button type="submit">등록</button>
+                </div>
+            </form>
+        </div>
+    </c:if>
+</div>
 </body>
 </html>

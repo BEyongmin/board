@@ -8,29 +8,7 @@
 </head>
 <body>
 <div class="page-wrap">
-
-    <div class="board-header">
-        <span class="brand">게시판</span>
-        <c:choose>
-            <c:when test="${pageContext.request.userPrincipal != null}">
-                <div class="session">
-                    <span>${pageContext.request.userPrincipal.name}님</span>
-                    <a href="/posts/new">글쓰기</a>
-                    <form action="/logout" method="post" style="display:inline">
-                        <%@ include file="/WEB-INF/views/fragments/csrf.jsp" %>
-                        <button type="submit" class="link-btn">로그아웃</button>
-                    </form>
-                </div>
-            </c:when>
-            <c:otherwise>
-                <div class="session">
-                    <a href="/login">로그인</a>
-                    <a href="/signup">회원가입</a>
-                </div>
-            </c:otherwise>
-        </c:choose>
-    </div>
-
+    <%@ include file="/WEB-INF/views/fragments/header.jsp" %>
     <form action="/posts" method="get" class="toolbar">
         <select name="type">
             <option value="TITLE" <c:if test="${type == 'TITLE'}">selected</c:if>>제목</option>

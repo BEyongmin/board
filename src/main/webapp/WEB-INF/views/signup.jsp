@@ -5,7 +5,7 @@
     <title>회원가입</title>
     <link rel="stylesheet" href="/css/board.css" />
 </head>
-<body>
+<body class="center-page">
 <div class="auth-note">
     <p class="auth-brand">게시판</p>
     <h1>회원가입</h1>

@@ -27,6 +27,7 @@ public class PostService {
     private final CommentRepository commentRepository;
     private final PostViewService postViewService;
     private final com.board.board.common.RateLimiter rateLimiter;
+    private final PostViewRepository postViewRepository;
 
     @Transactional(readOnly = true)
     public Page<Post> getList(Pageable pageable) {
@@ -123,6 +124,7 @@ public class PostService {
             }
 
             commentRepository.deleteAllByPostId(postId);
+            postViewRepository.deleteAllByPostId(postId);  
             postRepository.delete(post);
         }
 }
