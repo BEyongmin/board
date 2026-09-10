@@ -1,6 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
 <html>
 <head>
     <title>${post.title}</title>
@@ -12,18 +13,24 @@
     <a class="back-link" href="/posts">목록으로</a>
     <div class="detail-note">
         <span class="cat">${post.category.name}</span>
-        <h1>${post.title}</h1>
+        <h1>${fn:escapeXml(post.title)}</h1>
         <p class="meta">
-            ${post.user.name} ·
+            ${fn:escapeXml(post.user.name)} ·
             <fmt:formatDate value="${post.createdAtAsDate}" pattern="yyyy-MM-dd HH:mm" /> ·
             조회 ${post.viewCount}
         </p>
 
-        <c:if test="${post.hasImage()}">
-            <img class="image" src="${post.imagePath}" />
+        <c:if test="${not empty images}">
+            <div class="image-gallery">
+                <c:forEach var="img" items="${images}">
+                    <div class="${img.thumbnail ? 'thumbnail-badge' : ''}">
+                        <img src="${img.filePath}" />
+                    </div>
+                </c:forEach>
+            </div>
         </c:if>
 
-        <p class="body">${post.content}</p>
+        <p class="body">${fn:escapeXml(post.content)}</p>
 
         <c:if test="${pageContext.request.userPrincipal != null and pageContext.request.userPrincipal.name == post.user.email}">
             <div class="actions">
@@ -41,8 +48,8 @@
     <div class="comment-list">
         <c:forEach var="comment" items="${comments}" varStatus="status">
             <div class="comment-note ${status.index % 2 == 0 ? 'blue' : 'clay'}">
-                <p class="author">${comment.user.name}</p>
-                <p class="content">${comment.content}</p>
+                <p class="author">${fn:escapeXml(comment.user.name)}</p>
+                <p class="content">${fn:escapeXml(comment.content)}</p>
                 <p class="time"><fmt:formatDate value="${comment.createdAtAsDate}" pattern="MM-dd HH:mm" /></p>
                 <c:if test="${pageContext.request.userPrincipal != null and pageContext.request.userPrincipal.name == comment.user.email}">
                     <form action="/comments/${comment.id}/delete" method="post">

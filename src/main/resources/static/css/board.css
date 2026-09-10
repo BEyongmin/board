@@ -730,3 +730,66 @@ body.center-page {
   background: #414F38;
   transform: translateY(-1px);
 }
+
+.image-gallery {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+
+.image-gallery img {
+  width: 140px;
+  height: 140px;
+  object-fit: cover;
+  border-radius: 2px;
+  border: 1px solid var(--note-border);
+}
+
+.image-gallery .thumbnail-badge {
+  position: relative;
+}
+
+.image-gallery .thumbnail-badge::after {
+  content: "대표";
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  background: var(--ink);
+  color: #fff;
+  font-size: 9px;
+  padding: 2px 6px;
+  border-radius: 2px;
+}
+
+.image-grid {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.image-grid .image-item {
+  width: 100px;
+  text-align: center;
+}
+
+.image-grid .image-item img {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 2px;
+  border: 1px solid var(--note-border);
+  display: block;
+  margin-bottom: 6px;
+}
+
+.image-grid .image-item label {
+  font-size: 10px;
+  color: var(--ink-soft);
+  display: block;
+}
+
+.image-grid .image-item .remove-line {
+  margin-top: 4px;
+}

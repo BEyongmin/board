@@ -13,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class FileStorageService {
 
     private static final List<String> ALLOWED_EXTENSIONS = List.of("jpg", "jpeg", "png", "webp");
+    private static final int MAX_FILES_PER_POST = 5;
 
     @Value("${app.upload-dir}")
     private String uploadDir;
@@ -36,6 +37,12 @@ public class FileStorageService {
         }
 
         return storedName;
+    }
+
+    public void validateCount(int existingCount, int newCount) {
+        if (existingCount + newCount > MAX_FILES_PER_POST) {
+            throw new IllegalArgumentException("이미지는 게시글당 최대 " + MAX_FILES_PER_POST + "장까지 첨부할 수 있습니다.");
+        }
     }
 
     private String extractExtension(String filename) {

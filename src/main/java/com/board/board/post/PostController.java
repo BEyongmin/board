@@ -8,6 +8,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -27,6 +29,7 @@ public class PostController {
     private final PostService postService;
     private final CategoryRepository categoryRepository;
     private final CommentService commentService;
+    private final PostImageService postImageService;
 
     @GetMapping
     public String list(@RequestParam(required = false) String type,
@@ -53,6 +56,9 @@ public class PostController {
         model.addAttribute("postPage", postPage);
         model.addAttribute("keyword", keyword);
         model.addAttribute("sort", sort);
+
+        List<Long> postIds = postPage.getContent().stream().map(Post::getId).toList();
+        model.addAttribute("thumbnailMap", postImageService.getThumbnailMap(postIds));
         return "post/list";
     }
 
@@ -67,6 +73,7 @@ public class PostController {
 
         model.addAttribute("post", postService.getDetail(id, userId, sessionId));
         model.addAttribute("comments", commentService.getComments(id));
+        model.addAttribute("images", postImageService.getImages(id));
         return "post/detail";
     }
 
@@ -103,12 +110,11 @@ public class PostController {
         postForm.setCategoryId(post.getCategory().getId());
         postForm.setTitle(post.getTitle());
         postForm.setContent(post.getContent());
-        postForm.setUseAsThumbnail(post.isThumbnail());
 
         model.addAttribute("postForm", postForm);
         model.addAttribute("categories", categoryRepository.findAll());
         model.addAttribute("postId", id);
-        model.addAttribute("currentImagePath", post.getImagePath());
+        model.addAttribute("existingImages", postImageService.getImages(id));
         return "post/form";
     }
 

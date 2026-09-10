@@ -1,6 +1,8 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
+
 <html>
 <head>
     <title>게시판</title>
@@ -29,12 +31,13 @@
         <c:forEach var="post" items="${postPage.content}" varStatus="status">
             <a href="/posts/${post.id}" class="post-card c${status.index % 3 + 1}">
                 <span class="cat">${post.category.name}</span>
-                <c:if test="${post.thumbnail}">
-                    <img class="thumb" src="${post.imagePath}" />
+                <c:set var="thumb" value="${thumbnailMap[post.id]}" />
+                <c:if test="${thumb != null}">
+                    <img class="thumb" src="${thumb.filePath}" />
                 </c:if>
-                <p class="title">${post.title}</p>
+                <p class="title">${fn:escapeXml(post.title)}</p>
                 <p class="meta">
-                    <span>${post.user.name}</span>
+                    <span>${fn:escapeXml(post.user.name)}</span>
                     <span><fmt:formatDate value="${post.createdAtAsDate}" pattern="MM-dd HH:mm" /></span>
                 </p>
             </a>

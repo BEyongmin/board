@@ -4,6 +4,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.dao.DataIntegrityViolationException;
 
 import com.board.board.category.Category;
@@ -20,6 +25,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class PostService {
 
+    private final PostImageRepository postImageRepository;
     private final PostRepository postRepository;
     private final CategoryRepository categoryRepository;
     private final UserRepository userRepository;
@@ -28,6 +34,7 @@ public class PostService {
     private final PostViewService postViewService;
     private final com.board.board.common.RateLimiter rateLimiter;
     private final PostViewRepository postViewRepository;
+
 
     @Transactional(readOnly = true)
     public Page<Post> getList(Pageable pageable) {
@@ -67,24 +74,35 @@ public class PostService {
 
     @Transactional
     public Long create(Long userId, PostForm form) {
-        
-    if (!rateLimiter.isAllowed("post:" + userId, 3, 60_000)) {
-            throw new com.board.board.common.TooManyRequestsException("잠시 후 다시 시도해주세요. (1분에 최대 3개까지 작성 가능)");
-        }
-
-    User user = userRepository.findById(userId)
-            .orElseThrow(() -> new IllegalStateException("사용자를 찾을 수 없습니다."));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalStateException("사용자를 찾을 수 없습니다."));
         Category category = categoryRepository.findById(form.getCategoryId())
                 .orElseThrow(() -> new IllegalStateException("카테고리를 찾을 수 없습니다."));
 
         Post post = Post.create(user, category, form.getTitle(), form.getContent());
+        postRepository.save(post);
 
-        if (form.getImage() != null && !form.getImage().isEmpty()) {
-            String storedName = fileStorageService.store(form.getImage());
-            post.attachImage(storedName, form.getImage().getOriginalFilename(), form.isUseAsThumbnail());
+        List<MultipartFile> images = form.getImages();
+        List<MultipartFile> validImages = images.stream()
+                .filter(f -> f != null && !f.isEmpty())
+                .toList();
+
+        if (!validImages.isEmpty()) {
+            fileStorageService.validateCount(0, validImages.size());
+
+            for (int i = 0; i < validImages.size(); i++) {
+                MultipartFile file = validImages.get(i);
+                String storedName = fileStorageService.store(file);
+                boolean isThumbnail = form.getNewThumbnailIndex() != null
+                        && form.getNewThumbnailIndex() == i;
+
+                PostImage postImage = PostImage.create(
+                        post, file.getOriginalFilename(), storedName, isThumbnail
+                );
+                postImageRepository.save(postImage);
+            }
         }
 
-        postRepository.save(post);
         return post.getId();
     }
 
@@ -101,16 +119,43 @@ public class PostService {
                 .orElseThrow(() -> new IllegalStateException("카테고리를 찾을 수 없습니다."));
         post.update(category, form.getTitle(), form.getContent());
 
-        if (form.isRemoveImage()) {
-            // 1: 이미지 체크 시 무조건 삭제
-            post.removeImage();
-        } else if (form.getImage() != null && !form.getImage().isEmpty()) {
-            // 2: 새 파일이 올라왔으면 교체
-            String storedName = fileStorageService.store(form.getImage());
-            post.attachImage(storedName, form.getImage().getOriginalFilename(), form.isUseAsThumbnail());
-        } else if (post.hasImage()) {
-            // 3: 새 파일도 없고 삭제도 아니면, 대표 여부만 갱신
-            post.updateThumbnail(form.isUseAsThumbnail());
+        // 1) 삭제 요청된 기존 이미지 제거 (DB 행만, 실제 파일은 오늘 범위에서 생략)
+        List<Long> removeIds = form.getRemoveImageIds();
+        if (removeIds != null && !removeIds.isEmpty()) {
+            postImageRepository.deleteAllById(removeIds);
+        }
+
+        // 2) 새로 올리는 파일 개수 검증 (남은 기존 개수 + 새로 올리는 개수)
+        List<MultipartFile> validImages = form.getImages().stream()
+                .filter(f -> f != null && !f.isEmpty())
+                .toList();
+
+        int remainingExisting = postImageRepository.findAllByPostIdOrderByIdAsc(postId).size();
+        if (!validImages.isEmpty()) {
+            fileStorageService.validateCount(remainingExisting, validImages.size());
+        }
+
+        // 3) 새 이미지 저장
+        List<PostImage> newImages = new ArrayList<>();
+        for (MultipartFile file : validImages) {
+            String storedName = fileStorageService.store(file);
+            PostImage postImage = PostImage.create(post, file.getOriginalFilename(), storedName, false);
+            newImages.add(postImageRepository.save(postImage));
+        }
+
+        // 4) 대표 이미지 재지정 (요청이 있을 때만)
+        if (form.getThumbnailImageId() != null || form.getNewThumbnailIndex() != null) {
+            postImageRepository.clearThumbnailByPostId(postId);
+
+            if (form.getThumbnailImageId() != null) {
+                postImageRepository.findById(form.getThumbnailImageId())
+                        .ifPresent(PostImage::markAsThumbnail);
+            } else {
+                int idx = form.getNewThumbnailIndex();
+                if (idx >= 0 && idx < newImages.size()) {
+                    newImages.get(idx).markAsThumbnail();
+                }
+            }
         }
     }
 
