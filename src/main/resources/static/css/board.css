@@ -76,6 +76,12 @@ body.center-page {
   font-size: 13px;
   color: var(--ink-soft);
   margin: 0 0 18px;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.auth-brand:hover {
+  color: var(--ink);
 }
 
 .auth-note h1 {
@@ -220,36 +226,70 @@ body.center-page {
   margin-bottom: 22px;
 }
 
+
 .board-header .brand {
   font-size: 16px;
   font-weight: 500;
   color: var(--ink);
+  text-decoration: none;
+}
+
+.board-header .brand:hover {
+  color: #414F38;
 }
 
 .board-header .session {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 8px;
   font-size: 12px;
   color: var(--ink-soft);
 }
 
-.board-header a,
-.board-header button.link-btn {
-  color: var(--ink-soft);
-  text-decoration: underline;
-  text-underline-offset: 3px;
-  background: none;
-  border: none;
+.board-header .session .greeting {
+  margin-right: 4px;
+}
+
+.header-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 30px;
+  padding: 0 14px;
+  border-radius: 3px;
   font-size: 12px;
+  font-weight: 500;
+  text-decoration: none;
   cursor: pointer;
-  padding: 0;
+  line-height: 1;
   font-family: inherit;
+  appearance: none;
+  -webkit-appearance: none;
+  box-sizing: border-box;
 }
 
-.board-header a:hover,
-.board-header button.link-btn:hover {
+.header-btn.fill {
+  background: var(--ink);
+  color: #F5F3EE;
+  border: none;
+  transition: transform 0.12s ease, background 0.12s ease;
+}
+
+.header-btn.fill:hover {
+  background: #414F38;
+  transform: translateY(-1px);
+}
+
+.header-btn.outline {
+  background: transparent;
+  color: var(--ink-soft);
+  border: 1px solid var(--note-border);
+  transition: border-color 0.12s ease, color 0.12s ease;
+}
+
+.header-btn.outline:hover {
   color: var(--ink);
+  border-color: var(--ink-soft);
 }
 
 .toolbar {
@@ -792,4 +832,10 @@ body.center-page {
 
 .image-grid .image-item .remove-line {
   margin-top: 4px;
+}
+
+.board-header .session form {
+  display: inline-flex;
+  align-items: center;
+  margin: 0;
 }

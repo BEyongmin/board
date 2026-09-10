@@ -1,22 +1,22 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <div class="board-header">
-    <a href="/posts/new">게시판 새글작성</a>
-    <span class="brand">게시판</span>
+    <a class="brand" href="/posts">게시판</a>
     <c:choose>
         <c:when test="${pageContext.request.userPrincipal != null}">
             <div class="session">
-                <span>${pageContext.request.userPrincipal.name}님</span>
-                <form action="/logout" method="post" style="display:inline">
+                <span class="greeting">${pageContext.request.userPrincipal.name}님</span>
+                <a href="/posts/new" class="header-btn fill">글쓰기</a>
+                <form action="/logout" method="post">
                     <%@ include file="csrf.jsp" %>
-                    <button type="submit" class="link-btn">로그아웃</button>
+                    <button type="submit" class="header-btn outline">로그아웃</button>
                 </form>
             </div>
         </c:when>
         <c:otherwise>
             <div class="session">
-                <a href="/login">로그인</a>
-                <a href="/signup">회원가입</a>
+                <a href="/login" class="header-btn outline">로그인</a>
+                <a href="/signup" class="header-btn fill">회원가입</a>
             </div>
         </c:otherwise>
     </c:choose>

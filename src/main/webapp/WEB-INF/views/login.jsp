@@ -8,7 +8,7 @@
 </head>
 <body class="center-page">
 <div class="auth-note">
-    <p class="auth-brand">게시판</p>
+    <a class="auth-brand" href="/posts">게시판</a>
     <h1>로그인</h1>
 
     <c:if test="${param.error != null}">
