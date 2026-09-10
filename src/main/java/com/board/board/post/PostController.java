@@ -34,6 +34,7 @@ public class PostController {
     @GetMapping
     public String list(@RequestParam(required = false) String type,
                         @RequestParam(required = false) String keyword,
+                        @RequestParam(required = false) Long categoryId,
                         @RequestParam(defaultValue = "LATEST") String sort,
                         @PageableDefault(size = 18) Pageable pageable,
                         Model model) {
@@ -48,6 +49,9 @@ public class PostController {
             String searchType = (type == null || type.isBlank()) ? "TITLE" : type;
             postPage = postService.search(searchType, keyword, sortedPageable);
             model.addAttribute("type", searchType);
+        } else if (categoryId != null) {
+            postPage = postService.getListByCategory(categoryId, sortedPageable);
+            model.addAttribute("type", "TITLE");
         } else {
             postPage = postService.getList(sortedPageable);
             model.addAttribute("type", "TITLE");
@@ -56,6 +60,8 @@ public class PostController {
         model.addAttribute("postPage", postPage);
         model.addAttribute("keyword", keyword);
         model.addAttribute("sort", sort);
+        model.addAttribute("categoryId", categoryId);
+        model.addAttribute("categories", categoryRepository.findAll());
 
         List<Long> postIds = postPage.getContent().stream().map(Post::getId).toList();
         model.addAttribute("thumbnailMap", postImageService.getThumbnailMap(postIds));

@@ -164,16 +164,21 @@ public class PostService {
     }
 
     @Transactional
-        public void delete(Long postId, Long userId) {
-            Post post = postRepository.findById(postId)
-                    .orElseThrow(() -> new PostNotFoundException("게시글을 찾을 수 없습니다."));
+    public void delete(Long postId, Long userId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new PostNotFoundException("게시글을 찾을 수 없습니다."));
 
-            if (!post.isWrittenBy(userId)) {
-                throw new ForbiddenException("삭제 권한이 없습니다.");
-            }
-
-            commentRepository.deleteAllByPostId(postId);
-            postViewRepository.deleteAllByPostId(postId);  
-            postRepository.delete(post);
+        if (!post.isWrittenBy(userId)) {
+            throw new ForbiddenException("삭제 권한이 없습니다.");
         }
+
+        commentRepository.deleteAllByPostId(postId);
+        postViewRepository.deleteAllByPostId(postId);  
+        postRepository.delete(post);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<Post> getListByCategory(Long categoryId, Pageable pageable) {
+        return postRepository.findAllByCategoryId(categoryId, pageable);
+    }
 }

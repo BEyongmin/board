@@ -839,3 +839,31 @@ body.center-page {
   align-items: center;
   margin: 0;
 }
+
+.category-tabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.category-tabs a {
+  font-size: 12px;
+  padding: 6px 14px;
+  border-radius: 3px;
+  text-decoration: none;
+  color: var(--ink-soft);
+  border: 1px solid var(--note-border);
+  background: var(--field-bg);
+}
+
+.category-tabs a:hover {
+  border-color: var(--ink-soft);
+  color: var(--ink);
+}
+
+.category-tabs a.active {
+  background: var(--ink);
+  color: #F5F3EE;
+  border-color: var(--ink);
+}

@@ -27,4 +27,10 @@ public interface PostRepository extends JpaRepository<Post, Long> {
                 "or (:type = 'AUTHOR' and p.user.name like concat('%', :keyword, '%'))"
     )
     Page<Post> search(@Param("type") String type, @Param("keyword") String keyword, Pageable pageable);
+
+    @Query(
+    value = "select p from Post p join fetch p.user join fetch p.category where p.category.id = :categoryId",
+    countQuery = "select count(p) from Post p where p.category.id = :categoryId"
+    )
+    Page<Post> findAllByCategoryId(@Param("categoryId") Long categoryId, Pageable pageable);
 }
