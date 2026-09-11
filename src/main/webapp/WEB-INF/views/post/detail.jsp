@@ -62,12 +62,17 @@
         </c:forEach>
     </div>
 
+    <c:if test="${commentError != null}">
+        <p class="auth-message error">${fn:escapeXml(commentError)}</p>
+    </c:if>
+
     <c:if test="${pageContext.request.userPrincipal != null}">
         <div class="comment-form-note">
             <form action="/posts/${post.id}/comments" method="post">
                 <%@ include file="/WEB-INF/views/fragments/csrf.jsp" %>
-                <textarea name="content" placeholder="댓글을 남겨보세요"></textarea>
+                <textarea name="content" id="commentTextarea" maxlength="500" placeholder="댓글을 남겨보세요"></textarea>
                 <div class="submit-row">
+                    <span id="commentCount" class="char-count">0 / 500</span>
                     <button type="submit">등록</button>
                 </div>
             </form>
@@ -75,4 +80,14 @@
     </c:if>
 </div>
 </body>
+<script>
+const commentTextarea = document.getElementById('commentTextarea');
+const commentCount = document.getElementById('commentCount');
+
+if (commentTextarea) {
+    commentTextarea.addEventListener('input', function () {
+        commentCount.textContent = commentTextarea.value.length + ' / 500';
+    });
+}
+</script>
 </html>

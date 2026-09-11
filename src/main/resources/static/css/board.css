@@ -589,11 +589,23 @@ body.center-page {
 .comment-note.blue { background: #DCE1E8; border: 1px solid #C4CCD8; transform: rotate(0.6deg); }
 .comment-note.clay { background: #E8DCD3; border: 1px solid #D6C4B6; transform: rotate(-0.8deg); }
 
-.comment-note .author { font-size: 12px; font-weight: 500; margin: 0 0 4px; }
+.comment-note .author {
+  font-size: 12px;
+  font-weight: 500;
+  margin: 0 0 4px;
+  word-break: break-all;
+  overflow-wrap: break-word;
+}
 .comment-note.blue .author { color: #2C3540; }
 .comment-note.clay .author { color: #40332A; }
 
-.comment-note .content { font-size: 12px; margin: 0 0 6px; line-height: 1.5; }
+.comment-note .content {
+  font-size: 12px;
+  margin: 0 0 6px;
+  line-height: 1.5;
+  word-break: break-all;
+  overflow-wrap: break-word;
+}
 .comment-note.blue .content { color: #3A4550; }
 .comment-note.clay .content { color: #4A3D33; }
 
@@ -637,7 +649,8 @@ body.center-page {
 
 .comment-form-note .submit-row {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .comment-form-note button {
