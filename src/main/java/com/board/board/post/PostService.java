@@ -81,7 +81,7 @@ public class PostService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalStateException("사용자를 찾을 수 없습니다."));
         Category category = categoryRepository.findById(form.getCategoryId())
-                .orElseThrow(() -> new IllegalStateException("카테고리를 찾을 수 없습니다."));
+                .orElseThrow(() -> new InvalidCategoryException("존재하지 않는 카테고리입니다."));
 
         Post post = Post.create(user, category, form.getTitle(), form.getContent());
         postRepository.save(post);
@@ -120,7 +120,7 @@ public class PostService {
         }
 
         Category category = categoryRepository.findById(form.getCategoryId())
-                .orElseThrow(() -> new IllegalStateException("카테고리를 찾을 수 없습니다."));
+                .orElseThrow(() -> new InvalidCategoryException("존재하지 않는 카테고리입니다."));
         post.update(category, form.getTitle(), form.getContent());
 
         // 1) 삭제 요청된 기존 이미지 제거 (DB 행만, 실제 파일은 오늘 범위에서 생략)
