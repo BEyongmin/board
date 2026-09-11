@@ -1,11 +1,12 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 <div class="board-header">
     <a class="brand" href="/posts">게시판</a>
     <c:choose>
         <c:when test="${pageContext.request.userPrincipal != null}">
             <div class="session">
-                <span class="greeting">${pageContext.request.userPrincipal.name}님</span>
+                <span class="greeting"><sec:authentication property="principal.user.name" />님</span>
                 <a href="/posts/new" class="header-btn fill">글쓰기</a>
                 <form action="/logout" method="post">
                     <%@ include file="csrf.jsp" %>

@@ -22,7 +22,7 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/", "/login", "/signup", "/css/**", "/js/**", "/WEB-INF/**" ).permitAll()
+                .requestMatchers("/", "/login", "/signup", "/css/**", "/js/**", "/WEB-INF/**", "/uploads/**" ).permitAll()
 
                 // 구체적인 규칙을 먼저 (글쓰기/수정 페이지는 로그인 필요)
                 .requestMatchers(HttpMethod.GET, "/posts/new", "/posts/*/edit").authenticated()
