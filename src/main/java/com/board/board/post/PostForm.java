@@ -21,6 +21,7 @@ public class PostForm {
     private String title;
 
     @NotBlank(message = "내용을 입력해주세요.")
+    @Size (max = 5000, message = "내용은 5000자 이하로 입력해주세요")
     private String content;
 
     /** 새로 첨부하는 이미지 파일들 (0장 이상) */

@@ -478,6 +478,8 @@ body.center-page {
   font-weight: 500;
   color: #2C3626;
   margin: 0 0 8px;
+  word-break: break-all;
+  overflow-wrap: break-word;
 }
 
 .detail-note .meta {
@@ -495,6 +497,8 @@ body.center-page {
   color: #3A4530;
   line-height: 1.7;
   white-space: pre-wrap;
+  word-break: break-all;
+  overflow-wrap: break-word;
 }
 
 .detail-note .image {
@@ -938,4 +942,11 @@ body.center-page {
   font-size: 12px;
   color: var(--ink-soft);
   margin: 0;
+}
+
+.char-count {
+  font-size: 10px;
+  color: #A39D8C;
+  font-weight: 400;
+  margin-left: 6px;
 }

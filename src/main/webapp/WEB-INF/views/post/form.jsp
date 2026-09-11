@@ -32,12 +32,12 @@
 
             <div class="form-group">
                 <span class="field-label">제목</span>
-                <input type="text" name="title" value="${fn:escapeXml(postForm.title)}" />
+                <input type="text" name="title" value="${fn:escapeXml(postForm.title)}" maxlength="200" />
             </div>
 
             <div class="form-group">
-                <span class="field-label">내용</span>
-                <textarea name="content">${fn:escapeXml(postForm.content)}</textarea>
+                <span class="field-label">내용 <span id="contentCount" class="char-count">0 / 5000</span></span>
+                <textarea name="content" maxlength="5000" id="contentTextarea">${fn:escapeXml(postForm.content)}</textarea>
             </div>
 
             <c:if test="${not empty existingImages}">
@@ -84,6 +84,16 @@
 </div>
 
 <script>
+const contentTextarea = document.getElementById('contentTextarea');
+const contentCount = document.getElementById('contentCount');
+
+function updateCount() {
+    contentCount.textContent = contentTextarea.value.length + ' / 5000';
+}
+
+contentTextarea.addEventListener('input', updateCount);
+updateCount(); // 수정 화면 진입 시 기존 글자 수 초기 표시
+
 // 우리가 직접 관리하는 파일 목록 (브라우저 기본 input이 아니라 이 배열이 "진짜 상태"입니다)
 let selectedFiles = [];
 
