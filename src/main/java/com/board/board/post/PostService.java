@@ -174,6 +174,7 @@ public class PostService {
 
         commentRepository.deleteAllByPostId(postId);
         postViewRepository.deleteAllByPostId(postId);  
+        postImageRepository.deleteAllByPostId(postId);
         postRepository.delete(post);
     }
 
