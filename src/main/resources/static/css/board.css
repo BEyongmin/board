@@ -950,3 +950,18 @@ body.center-page {
   font-weight: 400;
   margin-left: 6px;
 }
+
+.form-error-list {
+  list-style: none;
+  margin: 0 0 16px;
+  padding: 12px 14px;
+  background: #F5E9E5;
+  border: 1px solid #D9B8AC;
+  border-radius: 3px;
+}
+
+.form-error-list li {
+  font-size: 12px;
+  color: var(--error);
+  line-height: 1.6;
+}

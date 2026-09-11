@@ -16,6 +16,14 @@
     <div class="post-form">
         <h1>${postId != null ? '게시글 수정' : '게시글 작성'}</h1>
 
+        <c:if test="${not empty errorMessages}">
+            <ul class="form-error-list">
+                <c:forEach var="msg" items="${errorMessages}">
+                    <li>${fn:escapeXml(msg)}</li>
+                </c:forEach>
+            </ul>
+        </c:if>
+
         <form action="${actionUrl}" method="post" enctype="multipart/form-data">
             <%@ include file="/WEB-INF/views/fragments/csrf.jsp" %>
 
@@ -37,7 +45,7 @@
 
             <div class="form-group">
                 <span class="field-label">내용 <span id="contentCount" class="char-count">0 / 5000</span></span>
-                <textarea name="content" maxlength="5000" id="contentTextarea">${fn:escapeXml(postForm.content)}</textarea>
+                <textarea name="content" maxlength="5000" id="contentTextarea" required>${fn:escapeXml(postForm.content)}</textarea>
             </div>
 
             <c:if test="${not empty existingImages}">

@@ -19,6 +19,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
@@ -97,6 +98,10 @@ public class PostController {
                           Model model) {
         if (bindingResult.hasErrors()) {
             model.addAttribute("categories", categoryRepository.findAll());
+            model.addAttribute("errorMessages",
+            bindingResult.getFieldErrors().stream()
+                    .map(FieldError::getDefaultMessage)
+                    .toList());
             return "post/form";
         }
         Long postId = postService.create(userDetails.getUser().getId(), postForm);
@@ -133,6 +138,10 @@ public class PostController {
         if (bindingResult.hasErrors()) {
             model.addAttribute("categories", categoryRepository.findAll());
             model.addAttribute("postId", id);
+            model.addAttribute("errorMessages",
+            bindingResult.getFieldErrors().stream()
+                    .map(FieldError::getDefaultMessage)
+                    .toList());
             return "post/form";
         }
         postService.update(id, userDetails.getUser().getId(), postForm);
